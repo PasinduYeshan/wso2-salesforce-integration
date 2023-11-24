@@ -22,7 +22,7 @@ public configurable string b2bAppClientSecret = ?;
 
 // Salesforce Field Mapping.
 public configurable string SFMappingEmail = "Email__c";
-public configurable string SFMappingOrgName = "Petcare_App_Org_Name__c";
+public configurable string SFMappingOrgName = "Petcare_App_Organization__c";
 
 // Salesforce configs.
 public configurable string SFSecurityToken = ?;
