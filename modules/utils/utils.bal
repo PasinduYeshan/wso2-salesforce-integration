@@ -17,7 +17,7 @@
 import wso2_salesforce_integration.config;
 
 // Get base64 encoded basic auth value.
-public function getBasicAuth() returns string {
+public isolated function getBasicAuth() returns string {
     string clientCredentials = config:b2bAppClientID + ":" + config:b2bAppClientSecret;
     return clientCredentials.toBytes().toBase64();
 }

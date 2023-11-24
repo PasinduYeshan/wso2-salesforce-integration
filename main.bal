@@ -14,18 +14,50 @@
 // specific language governing permissions and limitations
 // under the License.
 
-import ballerina/http;
+import ballerina/log;
+import ballerinax/trigger.salesforce as sfdc;
+import wso2_salesforce_integration.config;
 import wso2_salesforce_integration.models;
 import wso2_salesforce_integration.api;
 
-configurable int port = 9091;
-listener http:Listener httpListener = new (port);
+sfdc:ListenerConfig sfContactChangeEventConfig = {
+    username: config:SFUsername,
+    password: config:SFPassword + config:SFSecurityToken,
+    channelName: "/data/AccountChangeEvent"
+};
 
-service / on httpListener {
+listener sfdc:Listener sfContactEventListener = new (sfContactChangeEventConfig);
+service sfdc:RecordService on sfContactEventListener {
+    isolated remote function onCreate(sfdc:EventData payload) returns error? {
+        log:printInfo("DEBUG: SF status change payload: " + payload.toString());
+        map<json> changedData = payload.changedData;
 
-    resource function post createOrgAdmin(@http:Payload models:SalesforcePayload payload) returns 
-        http:Response|http:Created|http:InternalServerError|http:BadRequest {
+        string email = changedData.get(config:SFMappingEmail).toString();
+        string orgName = changedData.get(config:SFMappingOrgName).toString();
 
-        return api:createSubOrganizationAdmin(payload);
+        models:SalesforcePayload salesforcePayload = {
+            username: email,
+            email: email,
+            orgName: orgName
+        };
+
+        json response = check api:createSubOrganizationAdmin(salesforcePayload);
+        log:printInfo("INFO: Response :" + response.toString());
+        return;
+    }
+
+    isolated remote function onUpdate(sfdc:EventData payload) returns error? {
+        // Not implemented.
+        return;
+    }
+
+    isolated remote function onDelete(sfdc:EventData payload) returns error? {
+        // Not implemented.
+        return;
+    }
+
+    isolated remote function onRestore(sfdc:EventData payload) returns error? {
+        // Not implemented.
+        return;
     }
 }

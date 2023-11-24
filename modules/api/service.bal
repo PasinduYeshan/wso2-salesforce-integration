@@ -16,57 +16,65 @@
 
 import ballerina/http; 
 import ballerina/mime;
+import ballerina/log;
 
 import wso2_salesforce_integration.config;
 import wso2_salesforce_integration.models;
 import wso2_salesforce_integration.utils;
 
-public function createSubOrganizationAdmin(models:SalesforcePayload payload) returns 
-    http:Response|http:Created|http:InternalServerError|http:BadRequest {
+public isolated function createSubOrganizationAdmin(models:SalesforcePayload payload) returns json|error {
 
     // Get the access token.
     string|error accessToken = getAccessToken();
-    if accessToken is error {
-        return <http:InternalServerError> {body: "Error while getting access token."};
+    if (accessToken is error) {
+        log:printError("Error while getting access token.");
+        return error("Error while getting access token.");
     }
 
     // Check if the organization name is available.
     boolean|error isOrgNameAvailable = isOrganizationNameAvailable(payload.orgName, <string>accessToken);
-    if isOrgNameAvailable is error {
-        return <http:InternalServerError> {body: "Error while checking organization name availability."};
+    if (isOrgNameAvailable is error) {
+        log:printError("Error while checking organization name availability.");
+        return error("Error while checking organization name availability.");
     }
+
     if (!isOrgNameAvailable) {
-        return <http:BadRequest> {body: "Organization name is not available."};
+        log:printError("Organization name is not available.");
+        return error("Organization name is not available.");
     }
 
     // Creaet a sub organization.
     string|error subOrganizationId = createOrganization(payload.orgName, <string>accessToken);
-    if subOrganizationId is error {
-        return <http:InternalServerError> {body: "Error while creating sub organization."};
-    } 
+    if (subOrganizationId is error) {
+        log:printError("Error while creating sub organization.");
+        return error("Error while creating sub organization.");
+    }
     
     // Get sub organization token.
     string|error subOrganizationToken = getSubOrganizationToken(accessToken, subOrganizationId);
-    if subOrganizationToken is error {
-        return <http:InternalServerError> {body: "Error while getting sub organization token."};
+    if (subOrganizationToken is error) {
+        log:printError("Error while getting sub organization token.");
+        return error("Error while getting sub organization token.");
     }
 
     // Get admin role id.
     string|error adminRoleId = getApplicationRoleId(<string>subOrganizationToken);
-    if adminRoleId is error {
-        return <http:InternalServerError> {body: "Error while getting admin role id."};
+    if (adminRoleId is error) {
+        log:printError("Error while getting admin role id.");
+        return error("Error while getting admin role id.");
     }
 
-    // Create a user in the sub organization.
-    http:Response|error userResponse = createUser(payload, <string> adminRoleId, <string>subOrganizationToken);
-    if userResponse is error {
-        return <http:InternalServerError> {body: "Error while creating user."};
+    // Create the user in the sub organization.
+    json|error userResponse = createUser(payload, <string> adminRoleId, <string>subOrganizationToken);
+    if (userResponse is error) {
+        log:printError("Error while creating user.");
+        return error("Error while creating user.");
     }
     return userResponse;
 }
 
 // Get access token from the token endpoint.
-function getAccessToken() returns string|error {
+isolated function getAccessToken() returns string|error {
 
     http:Client clientTokenEndpoint = check new (
         config:tokenEndpoint, 
@@ -89,7 +97,7 @@ function getAccessToken() returns string|error {
 }
 
 // Check if the organization name is available.
-function isOrganizationNameAvailable(string organizationName, string accessToken) returns boolean|error {
+isolated function isOrganizationNameAvailable(string organizationName, string accessToken) returns boolean|error {
 
     http:Client checkOrganizationNameEndpoint = check new (
         config:organizationEndpoint, 
@@ -111,7 +119,7 @@ function isOrganizationNameAvailable(string organizationName, string accessToken
 }
 
 // Create a sub organization.
-function createOrganization(string organizationName, string accessToken) returns string|error {
+isolated function createOrganization(string organizationName, string accessToken) returns string|error {
 
     http:Client createSubOrganizationEndpoint = check new (
         config:organizationEndpoint, 
@@ -140,7 +148,7 @@ function createOrganization(string organizationName, string accessToken) returns
 }
 
 // Get a token for sub organization.
-function getSubOrganizationToken(string accessToken, string subOrganizationId) returns string|error {
+isolated function getSubOrganizationToken(string accessToken, string subOrganizationId) returns string|error {
 
     http:Client clientTokenEndpoint = check new (
         config:tokenEndpoint, 
@@ -165,7 +173,7 @@ function getSubOrganizationToken(string accessToken, string subOrganizationId) r
 }
 
 // Get the admin role id.
-function getApplicationRoleId(string subOrgAccessToken) returns string|error {
+isolated function getApplicationRoleId(string subOrgAccessToken) returns string|error {
 
     http:Client getAdminRoleIdEndpoint = check new (
         config:scimEndpoint, 
@@ -191,8 +199,8 @@ function getApplicationRoleId(string subOrgAccessToken) returns string|error {
 }
 
 // Create a user in the sub organization. 
-function createUser(models:SalesforcePayload salesForcePayload, string adminRoleId, string subOrgAccessToken) 
-    returns http:Response|error {
+isolated function createUser(models:SalesforcePayload salesForcePayload, string adminRoleId, string subOrgAccessToken) 
+    returns json|error {
 
     http:Client scimEndpoint = check new (
         config:scimEndpoint, 
@@ -208,10 +216,10 @@ function createUser(models:SalesforcePayload salesForcePayload, string adminRole
             "urn:ietf:params:scim:schemas:core:2.0:User",
             "urn:scim:wso2:schema"
             ],
-            "name": {
-                "familyName": salesForcePayload.firstName,
-                "givenName": salesForcePayload.lastName
-            },
+            // "name": {
+            //     "familyName": salesForcePayload.firstName,
+            //     "givenName": salesForcePayload.lastName
+            // },
             "userName": salesForcePayload.username,
             "emails": [
                 {
@@ -252,7 +260,7 @@ function createUser(models:SalesforcePayload salesForcePayload, string adminRole
         ]
     };
 
-    return check scimEndpoint->post(
+    json response =  check scimEndpoint->post(
         "/Bulk",
         requestBody,
         {
@@ -260,4 +268,5 @@ function createUser(models:SalesforcePayload salesForcePayload, string adminRole
         },
         mime:APPLICATION_JSON
     );
+    return response;
 }

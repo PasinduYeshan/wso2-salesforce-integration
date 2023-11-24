@@ -20,12 +20,24 @@ public configurable string applicationRoleName = "Administrator";
 public configurable string b2bAppClientID = ?;
 public configurable string b2bAppClientSecret = ?;
 
+// Salesforce Field Mapping.
+public configurable string SFMappingEmail = "Email__c";
+public configurable string SFMappingOrgName = "Petcare_App_Org_Name__c";
+
+// Salesforce configs.
+public configurable string SFSecurityToken = ?;
+public configurable string SFUsername = ?;
+public configurable string SFPassword = ?;
+
+// Salesforce OAuth configs.
+// public configurable string SFClientId = ?;
+// public configurable string SFClientSecret = ?;
+// public configurable string SFBaseUrl = ?;
+
 // Endpoints.
-public string tokenEndpoint =  baseUrl + "/oauth2/token";
-public string organizationEndpoint = baseUrl + "/api/server/v1/organizations";
-public string scimEndpoint = baseUrl + "/t/" + tenantDomain + "/o/scim2";
-public string createUserEndpoint = baseUrl + "/t/" + tenantDomain + "/o/scim2/Users";
-public string adminRoleIdEndpoint = baseUrl + "/t/" + tenantDomain + "/o/scim2/v2/Roles?filter=name%20eq%20admin";
-public string assignAdminRole = baseUrl + "/t/" + tenantDomain + "/o/scim2/v2/Roles/{admin-role-id}";
-
-
+public final string tokenEndpoint =  baseUrl + "/oauth2/token";
+public final string organizationEndpoint = baseUrl + "/api/server/v1/organizations";
+public final string scimEndpoint = baseUrl + "/t/" + tenantDomain + "/o/scim2";
+public final string createUserEndpoint = baseUrl + "/t/" + tenantDomain + "/o/scim2/Users";
+public final string adminRoleIdEndpoint = baseUrl + "/t/" + tenantDomain + "/o/scim2/v2/Roles?filter=name%20eq%20admin";
+public final string assignAdminRole = baseUrl + "/t/" + tenantDomain + "/o/scim2/v2/Roles/{admin-role-id}";
