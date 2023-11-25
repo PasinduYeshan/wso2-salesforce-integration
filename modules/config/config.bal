@@ -36,7 +36,7 @@ public configurable string SFPassword = ?;
 
 // Endpoints.
 public final string tokenEndpoint =  baseUrl + "/oauth2/token";
-public final string organizationEndpoint = baseUrl + "/api/server/v1/organizations";
+public final string apiServerEndpoint = baseUrl + "/api/server/v1";
 public final string scimEndpoint = baseUrl + "/t/" + tenantDomain + "/o/scim2";
 public final string createUserEndpoint = baseUrl + "/t/" + tenantDomain + "/o/scim2/Users";
 public final string adminRoleIdEndpoint = baseUrl + "/t/" + tenantDomain + "/o/scim2/v2/Roles?filter=name%20eq%20admin";

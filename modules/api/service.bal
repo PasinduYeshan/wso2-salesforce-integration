@@ -57,6 +57,13 @@ public isolated function createSubOrganizationAdmin(models:SalesforcePayload pay
         return error("Error while getting sub organization token.");
     }
 
+    // Change account recovery regex.
+    json|error changeAccountRecoveryRegexResponse = changeAccountRecoveryRegex(<string>subOrganizationToken);
+    if (changeAccountRecoveryRegexResponse is error) {
+        log:printError("Error while changing account recovery regex.");
+        return error("Error while changing account recovery regex.");
+    }
+
     // Get admin role id.
     string|error adminRoleId = getApplicationRoleId(<string>subOrganizationToken);
     if (adminRoleId is error) {
@@ -100,12 +107,12 @@ isolated function getAccessToken() returns string|error {
 isolated function isOrganizationNameAvailable(string organizationName, string accessToken) returns boolean|error {
 
     http:Client checkOrganizationNameEndpoint = check new (
-        config:organizationEndpoint, 
+        config:apiServerEndpoint, 
         httpVersion = http:HTTP_1_1
     );
 
     json organizationNameAvailabilityResponse = check checkOrganizationNameEndpoint->post(
-            "/check-name",
+            "/organizations/check-name",
         {
             "name": organizationName
         },
@@ -122,12 +129,12 @@ isolated function isOrganizationNameAvailable(string organizationName, string ac
 isolated function createOrganization(string organizationName, string accessToken) returns string|error {
 
     http:Client createSubOrganizationEndpoint = check new (
-        config:organizationEndpoint, 
+        config:apiServerEndpoint, 
         httpVersion = http:HTTP_1_1
     );
 
     http:Response response = check createSubOrganizationEndpoint->post(
-        "",
+        "/organizations",
         {
             "name": organizationName
         },
@@ -170,6 +177,35 @@ isolated function getSubOrganizationToken(string accessToken, string subOrganiza
     );
 
     return <string> check tokenResponse.access_token;
+}
+
+// Change account recovery regex of the sub organization.
+isolated function changeAccountRecoveryRegex(string subOrgAccessToken) returns json|error {
+
+    http:Client changeAccountRecoveryRegexEndpoint = check new (
+        config:apiServerEndpoint, 
+        httpVersion = http:HTTP_1_1
+    );
+
+    json requestBody = {
+        "operation": "UPDATE",
+        "properties": [
+            {
+            "name": "Recovery.CallbackRegex",
+            "value": ".*"
+            }
+        ]
+    };
+
+    json response =  check changeAccountRecoveryRegexEndpoint->patch(
+        "/identity-governance/QWNjb3VudCBNYW5hZ2VtZW50/connectors/YWNjb3VudC1yZWNvdmVyeQ",
+        requestBody,
+        {
+            "Authorization": string `Bearer ${subOrgAccessToken}`
+        },
+        mime:APPLICATION_JSON
+    );
+    return response;
 }
 
 // Get the admin role id.
