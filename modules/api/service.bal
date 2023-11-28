@@ -253,8 +253,8 @@ isolated function createUser(models:SalesforcePayload salesForcePayload, string 
             "urn:scim:wso2:schema"
             ],
             "name": {
-                "familyName": salesForcePayload.firstName,
-                "givenName": salesForcePayload.lastName
+                "familyName": salesForcePayload.lastName,
+                "givenName": salesForcePayload.firstName
             },
             "userName": salesForcePayload.username,
             "emails": [
