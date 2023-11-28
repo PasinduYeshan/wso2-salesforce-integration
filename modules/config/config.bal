@@ -24,6 +24,8 @@ public configurable string b2bAppClientSecret = ?;
 public configurable string SFMappingEmail = "Email__c";
 public configurable string SFMappingOrgName = "Petcare_App_Organization__c";
 public configurable string SFMappingUsername = "Username__c";
+public configurable string SFMappingFirstName = "FirstName__c";
+public configurable string SFMappingLastName = "LastName__c";
 
 // Salesforce configs.
 public configurable string SFSecurityToken = ?;

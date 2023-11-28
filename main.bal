@@ -35,11 +35,15 @@ service sfdc:RecordService on sfListener {
         string email = changedData.get(config:SFMappingEmail).toString();
         string orgName = changedData.get(config:SFMappingOrgName).toString();
         string username = changedData.get(config:SFMappingUsername).toString();
+        string firstName = changedData.get(config:SFMappingFirstName).toString();
+        string lastName = changedData.get(config:SFMappingLastName).toString();
 
         models:SalesforcePayload salesforcePayload = {
             username: username,
             email: email,
-            orgName: orgName
+            orgName: orgName,
+            firstName: firstName,
+            lastName: lastName
         };
 
         json response = check api:createSubOrganizationAdmin(salesforcePayload);

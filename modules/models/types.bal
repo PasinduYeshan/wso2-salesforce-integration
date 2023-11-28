@@ -18,6 +18,6 @@ public type SalesforcePayload record {
     string username;
     string email;
     string orgName;
-    // string firstName;
-    // string lastName;
+    string firstName;
+    string lastName;
 };
