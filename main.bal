@@ -20,23 +20,24 @@ import wso2_salesforce_integration.config;
 import wso2_salesforce_integration.models;
 import wso2_salesforce_integration.api;
 
-sfdc:ListenerConfig sfContactChangeEventConfig = {
+sfdc:ListenerConfig configuration = {
     username: config:SFUsername,
     password: config:SFPassword + config:SFSecurityToken,
     channelName: "/data/AccountChangeEvent"
 };
 
-listener sfdc:Listener sfContactEventListener = new (sfContactChangeEventConfig);
-service sfdc:RecordService on sfContactEventListener {
+listener sfdc:Listener sfListener = new (configuration);
+service sfdc:RecordService on sfListener {
     isolated remote function onCreate(sfdc:EventData payload) returns error? {
         log:printInfo("DEBUG: SF status change payload: " + payload.toString());
         map<json> changedData = payload.changedData;
 
         string email = changedData.get(config:SFMappingEmail).toString();
         string orgName = changedData.get(config:SFMappingOrgName).toString();
+        string username = changedData.get(config:SFMappingUsername).toString();
 
         models:SalesforcePayload salesforcePayload = {
-            username: email,
+            username: username,
             email: email,
             orgName: orgName
         };
