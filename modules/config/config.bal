@@ -14,9 +14,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
-public configurable string baseUrl = "https://is.wso2isdemo.com";
-public configurable string tenantDomain = "carbon.super";
-public configurable string applicationRoleName = "Administrator";
+public configurable string baseUrl = ?;
+public configurable string tenantDomain = ?;
+public configurable string applicationRoleName = ?;
 public configurable string b2bAppClientID = ?;
 public configurable string b2bAppClientSecret = ?;
 

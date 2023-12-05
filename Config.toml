@@ -1,0 +1,9 @@
+[wso2_salesforce_integration.config]
+baseUrl = ""
+tenantDomain = "carbon.super"
+applicationRoleName = "Administrator"
+b2bAppClientID = ""
+b2bAppClientSecret = ""
+SFSecurityToken = ""
+SFUsername = ""
+SFPassword = ""
