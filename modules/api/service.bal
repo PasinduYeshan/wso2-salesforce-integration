@@ -85,7 +85,13 @@ isolated function getAccessToken() returns string|error {
 
     http:Client clientTokenEndpoint = check new (
         config:tokenEndpoint, 
-        httpVersion = http:HTTP_1_1
+        httpVersion = http:HTTP_1_1,
+        secureSocket = {
+            cert: {
+                path: config:truststorePath,
+                password: config:truststorePassword
+            }
+        }
     );
 
     json tokenResponse = check clientTokenEndpoint->post(
@@ -108,7 +114,13 @@ isolated function isOrganizationNameAvailable(string organizationName, string ac
 
     http:Client checkOrganizationNameEndpoint = check new (
         config:apiServerEndpoint, 
-        httpVersion = http:HTTP_1_1
+        httpVersion = http:HTTP_1_1,
+        secureSocket = {
+            cert: {
+                path: config:truststorePath,
+                password: config:truststorePassword
+            }
+        }
     );
 
     json organizationNameAvailabilityResponse = check checkOrganizationNameEndpoint->post(
@@ -130,7 +142,13 @@ isolated function createOrganization(string organizationName, string accessToken
 
     http:Client createSubOrganizationEndpoint = check new (
         config:apiServerEndpoint, 
-        httpVersion = http:HTTP_1_1
+        httpVersion = http:HTTP_1_1,
+        secureSocket = {
+            cert: {
+                path: config:truststorePath,
+                password: config:truststorePassword
+            }
+        }
     );
 
     http:Response response = check createSubOrganizationEndpoint->post(
@@ -159,7 +177,13 @@ isolated function getSubOrganizationToken(string accessToken, string subOrganiza
 
     http:Client clientTokenEndpoint = check new (
         config:tokenEndpoint, 
-        httpVersion = http:HTTP_1_1
+        httpVersion = http:HTTP_1_1,
+        secureSocket = {
+            cert: {
+                path: config:truststorePath,
+                password: config:truststorePassword
+            }
+        }
     );
 
     json tokenResponse = check clientTokenEndpoint->post(
@@ -184,7 +208,13 @@ isolated function changeAccountRecoveryRegex(string subOrgAccessToken) returns j
 
     http:Client changeAccountRecoveryRegexEndpoint = check new (
         config:apiServerEndpoint, 
-        httpVersion = http:HTTP_1_1
+        httpVersion = http:HTTP_1_1,
+        secureSocket = {
+            cert: {
+                path: config:truststorePath,
+                password: config:truststorePassword
+            }
+        }
     );
 
     json requestBody = {
@@ -213,7 +243,13 @@ isolated function getApplicationRoleId(string subOrgAccessToken) returns string|
 
     http:Client getAdminRoleIdEndpoint = check new (
         config:scimEndpoint, 
-        httpVersion = http:HTTP_1_1
+        httpVersion = http:HTTP_1_1,
+        secureSocket = {
+            cert: {
+                path: config:truststorePath,
+                password: config:truststorePassword
+            }
+        }
     );
 
     json adminRoleIdResponse = check getAdminRoleIdEndpoint->get(
@@ -240,7 +276,13 @@ isolated function createUser(models:SalesforcePayload salesForcePayload, string 
 
     http:Client scimEndpoint = check new (
         config:scimEndpoint, 
-        httpVersion = http:HTTP_1_1
+        httpVersion = http:HTTP_1_1,
+        secureSocket = {
+            cert: {
+                path: config:truststorePath,
+                password: config:truststorePassword
+            }
+        }
     );
 
     json userCreation = {

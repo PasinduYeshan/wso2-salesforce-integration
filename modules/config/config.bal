@@ -19,6 +19,9 @@ public configurable string tenantDomain = ?;
 public configurable string applicationRoleName = ?;
 public configurable string b2bAppClientID = ?;
 public configurable string b2bAppClientSecret = ?;
+public configurable string truststorePath = ?;
+public configurable string truststorePassword = ?;
+
 
 // Salesforce Field Mapping.
 public configurable string SFMappingEmail = "Email__c";
@@ -44,3 +47,4 @@ public final string scimEndpoint = baseUrl + "/t/" + tenantDomain + "/o/scim2";
 public final string createUserEndpoint = baseUrl + "/t/" + tenantDomain + "/o/scim2/Users";
 public final string adminRoleIdEndpoint = baseUrl + "/t/" + tenantDomain + "/o/scim2/v2/Roles?filter=name%20eq%20admin";
 public final string assignAdminRole = baseUrl + "/t/" + tenantDomain + "/o/scim2/v2/Roles/{admin-role-id}";
+
