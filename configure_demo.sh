@@ -9,7 +9,7 @@ encoded_credentials=$(echo "$USERNAME:$PASSWORD" | base64)
 
 # Function to create B2B Application
 create_b2b_app() {
-    curl --location --request PATCH "$IS_BASE_PATH/api/server/v1/self-service/preferences" \
+    curl -k --location --request PATCH "$IS_BASE_PATH/api/server/v1/self-service/preferences" \
     --header "Content-Type: application/json" \
     --header "Authorization: Basic $encoded_credentials" \
     --data '{
@@ -29,7 +29,7 @@ get_application_id() {
     api_endpoint="$IS_BASE_PATH/api/server/v1/applications?filter=name+eq+B2B-Self-Service-Mgt-Application"
 
     # Send request and capture the response
-    response=$(curl --location "$api_endpoint" \
+    response=$(curl -k --location "$api_endpoint" \
         --header "Authorization: Basic $encoded_credentials" \
         --silent)
 
@@ -44,7 +44,7 @@ get_api_resource_id() {
     local resource_identifier=$1
 
     # Send request to retrieve API resources
-    response=$(curl --location "https://is.wso2isdemo.com/t/carbon.super/api/server/v1/api-resources?limit=100" \
+    response=$(curl -k --location "https://is.wso2isdemo.com/t/carbon.super/api/server/v1/api-resources?limit=100" \
         --header "Authorization: Basic $encoded_credentials" \
         --silent)
 
@@ -72,10 +72,14 @@ add_bulk_user_management_scope() {
     app_id=$(get_application_id)
     bulk_api_resource_id=$(get_api_resource_id "/o/scim2/Bulk")
     governance_api_resource_id=$(get_api_resource_id "/o/api/server/v1/identity-governance")
+
+    echo $app_id
+    echo $bulk_api_resource_id
+    echo $governance_api_resource_id
     
     # Check if Application ID is present
     if [ -n "$app_id" ] && [ "$app_id" != "null" ]; then
-        curl --location --request POST "$IS_BASE_PATH/api/server/v1/applications/$app_id/authorized-apis" \
+        curl -k --location --request POST "$IS_BASE_PATH/api/server/v1/applications/$app_id/authorized-apis" \
         --header "Content-Type: application/json" \
         --header "Authorization: Basic $encoded_credentials" \
         --data "{
@@ -84,14 +88,14 @@ add_bulk_user_management_scope() {
             "scopes":["internal_org_bulk_mgt_create","internal_org_bulk_mgt_delete","internal_org_bulk_mgt_update","internal_org_bulk_mgt_view"]
         }"
 
-        curl --location --request POST "$IS_BASE_PATH/api/server/v1/applications/$app_id/authorized-apis" \
-        --header "Content-Type: application/json" \
-        --header "Authorization: Basic $encoded_credentials" \
-        --data "{
-            "id":"$governance_api_resource_id",
-            "policyIdentifier":"RBAC",
-            "scopes":["internal_governance_view","internal_governance_update","internal_org_governance_view","internal_org_governance_update"]
-        }"
+        # curl -k --location --request POST "$IS_BASE_PATH/api/server/v1/applications/$app_id/authorized-apis" \
+        # --header "Content-Type: application/json" \
+        # --header "Authorization: Basic $encoded_credentials" \
+        # --data "{
+        #     "id":"$governance_api_resource_id",
+        #     "policyIdentifier":"RBAC",
+        #     "scopes":["internal_governance_view","internal_governance_update","internal_org_governance_view","internal_org_governance_update"]
+        # }"
     else
         echo "Error: Application ID not found."
     fi
